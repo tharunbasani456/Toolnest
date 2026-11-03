@@ -54,12 +54,12 @@ window.routeTo=routeTo;
 
 let natureOn=false,natureMarkers=[];
 const natureSites=[
-{at:[78.4738,17.4239],icon:'🦆',label:'Water birds · illustrative'},
-{at:[78.4732,17.4218],icon:'🐟',label:'Lake life · illustrative'},
-{at:[78.4205,17.4145],icon:'🌳',label:'Park trees · illustrative'},
-{at:[78.4200,17.4138],icon:'🦜',label:'Birdlife · illustrative'},
-{at:[78.4058,17.3856],icon:'🌴',label:'Greenery · illustrative'},
-{at:[78.3455,17.4175],icon:'🦌',label:'Wildlife icon · illustrative'},
+{at:[78.4738,17.4239],icon:'🦆',label:'Decorative water-bird icon'},
+{at:[78.4732,17.4218],icon:'🐟',label:'Decorative lake-life icon'},
+{at:[78.4205,17.4145],icon:'🌳',label:'Tree symbol'},
+{at:[78.4200,17.4138],icon:'🦜',label:'Decorative bird icon'},
+{at:[78.4058,17.3856],icon:'🌴',label:'Tree symbol'},
+{at:[78.3455,17.4175],icon:'🦌',label:'Decorative wildlife icon'},
 {at:[78.4910,17.3670],icon:'🕊️',label:'Birdlife · illustrative'}
 ];
 document.getElementById('nature').onclick=()=>{
@@ -71,7 +71,7 @@ document.getElementById('nature').onclick=()=>{
  natureMarkers.push(m);
  });
  document.getElementById('nature').classList.add('primary');
- toast('Nature icons enabled · illustrative, not live wildlife data');
+ toast('Nature symbols enabled · decorative icons, not live wildlife data');
  }else{
  natureMarkers.forEach(m=>m.remove());natureMarkers=[];
  document.getElementById('nature').classList.remove('primary');
