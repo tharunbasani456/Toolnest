@@ -65,14 +65,15 @@ async function startStreetWalk(){
  let center=origin||[map.getCenter().lng,map.getCenter().lat];
  streetStatus.textContent='Searching nearby community street photos…';streetImage.style.display='none';streetEmpty.style.display='block';streetEmpty.textContent='Loading street-level images for this area…';
  try{
- const url='https://api.openstreetcam.org/2.0/photo/?lat='+center[1]+'&lng='+center[0]+'&radius=500&join=sequence';
- const res=await fetch(url);if(!res.ok)throw Error('service');const data=await res.json();
- const arr=data?.result?.data?.photos||data?.result?.photos||data?.photos||data?.data?.photos||[];
- streetPhotos=arr.filter(p=>p.photo_url||p.image_url||p.thumb_url||p.photoUrl||p.imageUrl);
+ const url='https://api.kartaview.org/2.0/photo/?lat='+center[1]+'&lng='+center[0]+'&zoomLevel=18&itemsPerPage=50';
+ const res=await fetch(url);if(!res.ok)throw Error('HTTP '+res.status);const data=await res.json();
+ if(data?.status?.apiCode && ![600,601,602].includes(Number(data.status.apiCode)))throw Error(data.status.apiMessage||'KartaView API error');
+ const arr=data?.result?.data||data?.result?.data?.photos||data?.result?.photos||data?.photos||data?.data?.photos||[];
+ streetPhotos=arr.map(p=>({...p,photo_url:p.imageProcUrl||p.imageUrl||p.photo_url||p.image_url||p.fileurlProc||p.fileUrl||p.thumb_url||p.photoUrl})).filter(p=>p.photo_url);
  if(!streetPhotos.length){streetStatus.textContent='No street photos found nearby';streetEmpty.style.display='block';streetEmpty.textContent='No KartaView street imagery was found within 500 m of this point. Try My location in another street or move the map and retry. Coverage varies by neighborhood.';return;}
  streetPhotos.sort((a,b)=>{const da=Math.hypot((a.lat||a.latitude||center[1])-center[1],((a.lng||a.longitude||center[0])-center[0])*Math.cos(center[1]*Math.PI/180));const db=Math.hypot((b.lat||b.latitude||center[1])-center[1],((b.lng||b.longitude||center[0])-center[0])*Math.cos(center[1]*Math.PI/180));return da-db});
  streetIndex=0;showStreetPhoto(0);
- }catch(e){streetStatus.textContent='Street imagery service unavailable';streetEmpty.style.display='block';streetEmpty.textContent='Could not load KartaView imagery right now. The public service may be unavailable or restrict browser requests. You can try again later.'}
+ }catch(e){streetStatus.textContent='No usable KartaView imagery';streetEmpty.style.display='block';streetEmpty.textContent='KartaView did not return usable street photos. Its public imagery may be unavailable here, or there may be no nearby coverage. Try another map location.'}
 }
 document.getElementById('streetWalk').onclick=startStreetWalk;
 document.getElementById('streetWalkClose').onclick=()=>streetPanel.style.display='none';
