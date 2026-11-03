@@ -54,29 +54,31 @@ window.routeTo=routeTo;
 
 let natureOn=false,natureMarkers=[];
 const natureSites=[
-{at:[78.4738,17.4239],icon:'🦆',label:'Decorative water-bird icon'},
-{at:[78.4732,17.4218],icon:'🐟',label:'Decorative lake-life icon'},
-{at:[78.4205,17.4145],icon:'🌳',label:'Tree symbol'},
-{at:[78.4200,17.4138],icon:'🦜',label:'Decorative bird icon'},
-{at:[78.4058,17.3856],icon:'🌴',label:'Tree symbol'},
-{at:[78.3455,17.4175],icon:'🦌',label:'Decorative wildlife icon'},
-{at:[78.4910,17.3670],icon:'🕊️',label:'Birdlife · illustrative'}
+{at:[78.4738,17.4239],kind:'tree',label:'3D lakeside tree'},
+{at:[78.4732,17.4218],kind:'bird',label:'3D bird model'},
+{at:[78.4205,17.4145],kind:'tree',label:'3D park tree'},
+{at:[78.4200,17.4138],kind:'deer',label:'3D deer model'},
+{at:[78.4058,17.3856],kind:'tree',label:'3D tree'},
+{at:[78.3455,17.4175],kind:'deer',label:'3D animal model'},
+{at:[78.4910,17.3670],kind:'tree',label:'3D tree'}
 ];
+function makeNatureModel(kind){
+ const e=document.createElement('div');e.className='nature-model '+kind;
+ if(kind==='tree')e.innerHTML='<div class="tree-shadow"></div><div class="tree-trunk"></div><div class="tree-crown crown1"></div><div class="tree-crown crown2"></div><div class="tree-crown crown3"></div>';
+ if(kind==='deer')e.innerHTML='<div class="animal-shadow"></div><div class="deer-body"></div><div class="deer-neck"></div><div class="deer-head"></div><div class="deer-ear"></div><div class="deer-tail"></div><div class="deer-leg l1"></div><div class="deer-leg l2"></div><div class="deer-leg l3"></div><div class="deer-leg l4"></div>';
+ if(kind==='bird')e.innerHTML='<div class="bird-body"></div><div class="bird-wing"></div><div class="bird-head"></div><div class="bird-beak"></div><div class="bird-leg"></div>';
+ return e;
+}
+const natureCss=document.createElement('style');natureCss.textContent=`
+.nature-model{position:relative;width:76px;height:112px;transform:perspective(500px) rotateX(-8deg);transform-origin:bottom center;pointer-events:auto;filter:drop-shadow(2px 5px 3px #16220c45)}
+.tree{width:68px;height:112px}.tree-trunk{position:absolute;bottom:0;left:30px;width:12px;height:44px;background:linear-gradient(90deg,#58351d,#a66b39 45%,#4c2d18);border-radius:3px;transform:rotateY(-18deg);box-shadow:5px 0 2px #43271455}.tree-crown{position:absolute;left:5px;width:58px;height:58px;bottom:34px;clip-path:polygon(50% 0,94% 82%,6% 82%);background:linear-gradient(135deg,#76bd55,#1f6c32 65%,#174a27);filter:drop-shadow(3px 4px 1px #16432166);transform:rotateY(-18deg)}.crown1{bottom:50px;width:48px;height:53px;left:10px;background:linear-gradient(120deg,#8bd46a,#287c3c)}.crown2{bottom:30px}.crown3{bottom:12px;width:64px;height:58px;left:2px;background:linear-gradient(130deg,#5da849,#1b5b2c)}
+.deer{width:94px;height:70px;filter:drop-shadow(2px 4px 2px #24180c66)}.animal-shadow{position:absolute;bottom:0;left:14px;width:70px;height:10px;border-radius:50%;background:#15210c40}.deer-body{position:absolute;left:18px;bottom:24px;width:48px;height:25px;border-radius:52% 45% 42% 48%;background:linear-gradient(140deg,#d9a46a,#89552e 70%);transform:rotate(-5deg)}.deer-neck{position:absolute;left:55px;bottom:35px;width:15px;height:30px;border-radius:60% 40% 20% 50%;background:linear-gradient(90deg,#9c6638,#d4a06a);transform:rotate(-24deg)}.deer-head{position:absolute;left:64px;bottom:54px;width:20px;height:15px;border-radius:60% 45% 45% 50%;background:#c28a52;transform:rotate(-12deg)}.deer-ear{position:absolute;left:70px;bottom:68px;width:4px;height:13px;background:#9c6638;border-radius:80%;transform:rotate(25deg)}.deer-tail{position:absolute;left:13px;bottom:43px;width:10px;height:8px;background:#e4c08c;border-radius:80%;transform:rotate(-35deg)}.deer-leg{position:absolute;bottom:5px;width:5px;height:28px;background:linear-gradient(90deg,#674025,#b27b48);border-radius:3px;transform-origin:top;}.l1{left:26px;transform:rotate(5deg)}.l2{left:37px;transform:rotate(-5deg)}.l3{left:56px;transform:rotate(8deg)}.l4{left:64px;transform:rotate(-10deg)}
+.bird{width:50px;height:42px;filter:drop-shadow(2px 4px 2px #18203b55)}.bird-body{position:absolute;left:8px;bottom:10px;width:29px;height:19px;border-radius:60% 50%;background:linear-gradient(135deg,#4f8fd1,#234a86)}.bird-wing{position:absolute;left:12px;bottom:16px;width:23px;height:12px;border-radius:80% 10%;background:linear-gradient(135deg,#a8d5f5,#3566a5);transform:rotate(-30deg)}.bird-head{position:absolute;left:31px;bottom:25px;width:14px;height:14px;border-radius:50%;background:#4f8fd1}.bird-beak{position:absolute;left:43px;bottom:29px;width:8px;height:5px;background:#e6a52b;clip-path:polygon(0 0,100% 50%,0 100%)}.bird-leg{position:absolute;left:21px;bottom:3px;width:2px;height:9px;background:#c58d35}
+`;document.head.appendChild(natureCss);
 document.getElementById('nature').onclick=()=>{
  natureOn=!natureOn;
- if(natureOn){
- natureSites.forEach(s=>{
- const el=markerElement(s.icon);el.style.width='40px';el.style.height='40px';el.style.borderColor='#16a34a';el.style.background='#f0fdf4';
- const m=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(s.at).setPopup(new maplibregl.Popup({offset:22}).setText(s.label)).addTo(map);
- natureMarkers.push(m);
- });
- document.getElementById('nature').classList.add('primary');
- toast('Nature symbols enabled · decorative icons, not live wildlife data');
- }else{
- natureMarkers.forEach(m=>m.remove());natureMarkers=[];
- document.getElementById('nature').classList.remove('primary');
- toast('Nature icons hidden');
- }
+ if(natureOn){natureSites.forEach(s=>{const el=makeNatureModel(s.kind);const m=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(s.at).setPopup(new maplibregl.Popup({offset:16}).setText(s.label)).addTo(map);natureMarkers.push(m)});document.getElementById('nature').classList.add('primary');toast('3D nature models enabled · stylized models')}
+ else{natureMarkers.forEach(m=>m.remove());natureMarkers=[];document.getElementById('nature').classList.remove('primary');toast('3D nature models hidden')}
 };
 
 </script>
